@@ -1,5 +1,5 @@
 import requests
-import os.path
+import os
 import time
 import sys
 import json
@@ -7,29 +7,19 @@ import sqlite3
 import traceback
 import xml.etree.ElementTree as ET
 
-CONFIG_FILE = 'config.xml'
-RADARR_URL = 'https://radarr-dev.apps.ovv.elserverido.com'
+
+###########################################################
+# SET STATIC VARIABLES
+###########################################################
+CONFIG_FILE = '/config/config.xml'
+RADARR_URL = 'http://127.0.0.1:7878'
 RADARR_DB = '/config/radarr.db'
 
-RADARR_USER = "admin"
-RADARR_PASSWORD = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
-RADARR_ROOTPATH = "/movies/films"
-RADARR_REMOTEPATH = "/downloads/"
-RADARR_LOCALPATH = "/movies/downloads/"
-
-INDEXER_NAME = "Jackett"
-INDEXER_URL = "http://jackett-web:9117/api/v2.0/indexers/yggtorrent/results/torznab/"
-INDEXER_APIKEY = "6ktsn66wjqri8766jtmuhe944p168p1o"
-
-DOWNLOADER_NAME = "Transmission"
-DOWNLOADER_URL = "transmission-web"
-DOWNLOADER_PORT = 9091
-DOWNLOADER_USER = "admin"
-DOWNLOADER_PASSWORD = "x4L9JvRu9wT4"
-DOWNLOADER_CATEGORY = "films"
 
 
-
+###########################################################
+# DEFINE FUNCTION
+###########################################################
 def get_apikey(file):
     apikey = ""
 
@@ -283,13 +273,38 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
     return response.status_code
 
 
+
+###########################################################
+# INIT CONFIG
+###########################################################
+
+print("[INIT] Get environment variable")
+RADARR_USER = os.environ.get('RADARR_USER')
+RADARR_PASSWORD = os.environ.get('RADARR_PASSWORD')
+RADARR_ROOTPATH = os.environ.get('RADARR_ROOTPATH')
+RADARR_REMOTEPATH = os.environ.get('RADARR_REMOTEPATH')
+RADARR_LOCALPATH = os.environ.get('RADARR_LOCALPATH')
+
+INDEXER_NAME = os.environ.get('INDEXER_NAME')
+INDEXER_URL = os.environ.get('INDEXER_URL')
+INDEXER_APIKEY = os.environ.get('INDEXER_APIKEY')
+
+DOWNLOADER_NAME = os.environ.get('DOWNLOADER_NAME')
+DOWNLOADER_URL = os.environ.get('DOWNLOADER_URL')
+DOWNLOADER_PORT = os.environ.get('DOWNLOADER_PORT')
+DOWNLOADER_USER = os.environ.get('DOWNLOADER_USER')
+DOWNLOADER_PASSWORD = os.environ.get('DOWNLOADER_PASSWORD')
+DOWNLOADER_CATEGORY = os.environ.get('DOWNLOADER_CATEGORY')
+
+
+
 print("[INIT] Waiting for application %s ..." % RADARR_URL)
 RADARR_APIKEY = get_apikey(CONFIG_FILE)
 while check_health(RADARR_URL, RADARR_APIKEY) != 200:
     time.sleep(1)
 
 print("[INIT] Set Credential to application ...")
-#set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
+set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
 set_authenticationmethod(CONFIG_FILE, "forms")
 
 print("[INIT] Configuring root path...")
