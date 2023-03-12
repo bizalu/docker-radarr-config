@@ -48,14 +48,14 @@ def check_health(url, apikey):
         response = requests.get(api_url, headers=api_header)
         response.raise_for_status()
     except requests.exceptions.HTTPError as errh:
-        print(errh)
+        print(errh, file=sys.stderr)
         sys.exit(response.status_code)
     except requests.exceptions.ConnectionError as errc:
-        print(errc)
+        print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
-        print(errt)
+        print(errt, file=sys.stderr)
     except requests.exceptions.RequestException as err:
-        print(err)
+        print(err, file=sys.stderr)
 
     return response.status_code
 
@@ -70,19 +70,17 @@ def set_credential(database, username, password):
     try:
         db.execute(query, data)
         connexion.commit()
-        db.close()
     except sqlite3.Error as er:
         if er.args == "UNIQUE constraint failed: Users.Username":
-            print("*** warning *** User %s already exist" % username)
-            db.close()
+            print("*** warning *** User %s already exist" % username, file=sys.stdout)
         else:
-            print('SQLite error: %s' % (' '.join(er.args)))
-            print("Exception class is: ", er.__class__)
-            print('SQLite traceback: ')
+            print('SQLite error: %s' % (' '.join(er.args)), file=sys.stderr)
+            print("Exception class is: ", er.__class__, file=sys.stderr)
+            print('SQLite traceback: ', file=sys.stderr)
             exc_type, exc_value, exc_tb = sys.exc_info()
-            print(traceback.format_exception(exc_type, exc_value, exc_tb))
-            db.close()
+            print(traceback.format_exception(exc_type, exc_value, exc_tb), file=sys.stderr)
 
+    db.close()
 
 def add_rootfolder(url, apikey, folder):
     api_url = url + "/api/v3/rootfolder"
@@ -97,15 +95,15 @@ def add_rootfolder(url, apikey, folder):
     except requests.exceptions.HTTPError as errh:
         message = json.loads(json.dumps(response.json()[0]))
         if message["errorMessage"] == "Path is already configured as a root folder":
-            print("*** warning *** root folder %s already exist" % folder)
+            print("*** warning *** root folder %s already exist" % folder, file=sys.stdout)
         else:
-            print(errh)
+            print(errh, file=sys.stderr)
     except requests.exceptions.ConnectionError as errc:
-        print(errc)
+        print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
-        print(errt)
+        print(errt, file=sys.stderr)
     except requests.exceptions.RequestException as err:
-        print(err)
+        print(err, file=sys.stderr)
 
     return response.status_code
 
@@ -158,15 +156,15 @@ def add_torznab_indexer(url, apikey, name, indexer_url, indexer_apikey):
     except requests.exceptions.HTTPError as errh:
         message = json.loads(json.dumps(response.json()[0]))
         if message["errorMessage"] == "Should be unique":
-            print("*** warning *** indexer %s already exist" % name)
+            print("*** warning *** indexer %s already exist" % name, file=sys.stdout)
         else:
-            print(errh)
+            print(errh, file=sys.stderr)
     except requests.exceptions.ConnectionError as errc:
-        print(errc)
+        print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
-        print(errt)
+        print(errt, file=sys.stderr)
     except requests.exceptions.RequestException as err:
-        print(err)
+        print(err, file=sys.stderr)
 
     return response.status_code
 
@@ -236,15 +234,15 @@ def add_transmission_downloader(url, apikey, name, downloader_url, downloader_po
     except requests.exceptions.HTTPError as errh:
         message = json.loads(json.dumps(response.json()[0]))
         if message["errorMessage"] == "Should be unique":
-            print("*** warning *** downloader client %s already exist" % name)
+            print("*** warning *** downloader client %s already exist" % name, file=sys.stdout)
         else:
-            print(errh)
+            print(errh, file=sys.stderr)
     except requests.exceptions.ConnectionError as errc:
-        print(errc)
+        print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
-        print(errt)
+        print(errt, file=sys.stderr)
     except requests.exceptions.RequestException as err:
-        print(err)
+        print(err, file=sys.stderr)
 
     return response.status_code
 
@@ -264,15 +262,15 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
     except requests.exceptions.HTTPError as errh:
         message = json.loads(json.dumps(response.json()))
         if message["message"] == "RemotePath already mounted.":
-            print("*** warning *** downloader remote path for %s already exist" % downloader_url)
+            print("*** warning *** downloader remote path for %s already exist" % downloader_url, file=sys.stdout)
         else:
-            print(errh)
+            print(errh, file=sys.stderr)
     except requests.exceptions.ConnectionError as errc:
-        print(errc)
+        print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
-        print(errt)
+        print(errt, file=sys.stderr)
     except requests.exceptions.RequestException as err:
-        print(err)
+        print(err, file=sys.stderr)
 
     return response.status_code
 
@@ -281,7 +279,7 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
 # INIT CONFIG
 ###########################################################
 
-print("[INIT] Get environment variable")
+print("[INIT] Get environment variable", file=sys.stdout)
 RADARR_USER = os.environ.get('RADARR_USER')
 RADARR_PASSWORD = os.environ.get('RADARR_PASSWORD')
 RADARR_ROOTPATH = os.environ.get('RADARR_ROOTPATH')
@@ -299,25 +297,25 @@ DOWNLOAD_USER = os.environ.get('DOWNLOAD_USER')
 DOWNLOAD_PASSWORD = os.environ.get('DOWNLOAD_PASSWORD')
 DOWNLOAD_FILMCATEGORY = os.environ.get('DOWNLOAD_FILMCATEGORY')
 
-print("[INIT] Waiting for application %s ..." % RADARR_URL)
+print("[INIT] Waiting for application %s ..." % RADARR_URL, file=sys.stdout)
 RADARR_APIKEY = get_apikey(CONFIG_FILE)
 while check_health(RADARR_URL, RADARR_APIKEY) != 200:
     time.sleep(1)
 
-print("[INIT] Set Credential to application ...")
+print("[INIT] Set Credential to application ...", file=sys.stdout)
 #set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
 set_authenticationmethod(CONFIG_FILE, "Forms")
 
-print("[INIT] Configuring root path...")
+print("[INIT] Configuring root path...", file=sys.stdout)
 add_rootfolder(RADARR_URL, RADARR_APIKEY, RADARR_ROOTPATH)
 
-print("[INIT] Configuring Indexer...")
+print("[INIT] Configuring Indexer...", file=sys.stdout)
 add_torznab_indexer(RADARR_URL, RADARR_APIKEY, INDEXER_NAME, INDEXER_URL, INDEXER_APIKEY)
 
-print("[INIT] Configuring Downloader Client...")
+print("[INIT] Configuring Downloader Client...", file=sys.stdout)
 add_transmission_downloader(RADARR_URL, RADARR_APIKEY, DOWNLOAD_NAME, DOWNLOAD_URL, DOWNLOAD_PORT, DOWNLOAD_USER,
                             DOWNLOAD_PASSWORD, DOWNLOAD_FILMCATEGORY)
 add_downloader_remotepath(RADARR_URL, RADARR_APIKEY, DOWNLOAD_URL, RADARR_REMOTEPATH, RADARR_LOCALPATH)
 
 while True:
-    time.sleep(10)
+    time.sleep(1)
