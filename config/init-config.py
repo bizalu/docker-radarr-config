@@ -41,7 +41,7 @@ def set_authenticationmethod(file, method):
 
 
 def check_health(url, apikey):
-    api_url = url + "/api/v3/health"
+    api_url = url + "/api/v3/system/status"
     api_header = {'accept': 'application/json', 'X-Api-Key': apikey}
 
     try:
@@ -49,7 +49,6 @@ def check_health(url, apikey):
         response.raise_for_status()
     except requests.exceptions.HTTPError as errh:
         print(errh, file=sys.stderr)
-        sys.exit(response.status_code)
     except requests.exceptions.ConnectionError as errc:
         print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
