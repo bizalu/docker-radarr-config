@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 # SET STATIC VARIABLES
 ###########################################################
 CONFIG_FILE = '/config/config.xml'
+RADARR_URL = 'http://localhost:7878'
 RADARR_DB = '/config/radarr.db'
 
 
@@ -279,7 +280,6 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
 ###########################################################
 
 print("[INIT] Get environment variable")
-RADARR_URL = os.environ.get('RADARR_URL')
 RADARR_USER = os.environ.get('RADARR_USER')
 RADARR_PASSWORD = os.environ.get('RADARR_PASSWORD')
 RADARR_ROOTPATH = os.environ.get('RADARR_ROOTPATH')
