@@ -69,17 +69,18 @@ def set_credential(database, username, password):
     try:
         db.execute(query, data)
         connexion.commit()
+        db.close()
     except sqlite3.Error as er:
         if er.args == "UNIQUE constraint failed: Users.Username":
             print("*** warning *** User %s already exist" % username)
+            db.close()
         else:
             print('SQLite error: %s' % (' '.join(er.args)))
             print("Exception class is: ", er.__class__)
             print('SQLite traceback: ')
             exc_type, exc_value, exc_tb = sys.exc_info()
             print(traceback.format_exception(exc_type, exc_value, exc_tb))
-
-    db.close()
+            db.close()
 
 
 def add_rootfolder(url, apikey, folder):
