@@ -304,7 +304,7 @@ while check_health(RADARR_URL, RADARR_APIKEY) != 200:
     time.sleep(1)
 
 print("[INIT] Set Credential to application ...")
-set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
+#set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
 set_authenticationmethod(CONFIG_FILE, "Forms")
 
 print("[INIT] Configuring root path...")
