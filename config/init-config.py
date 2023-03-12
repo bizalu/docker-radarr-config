@@ -316,3 +316,6 @@ print("[INIT] Configuring Downloader Client...")
 add_transmission_downloader(RADARR_URL, RADARR_APIKEY, DOWNLOAD_NAME, DOWNLOAD_URL, DOWNLOAD_PORT, DOWNLOAD_USER,
                             DOWNLOAD_PASSWORD, DOWNLOAD_FILMCATEGORY)
 add_downloader_remotepath(RADARR_URL, RADARR_APIKEY, DOWNLOAD_URL, RADARR_REMOTEPATH, RADARR_LOCALPATH)
+
+while True:
+    time.sleep(10)
