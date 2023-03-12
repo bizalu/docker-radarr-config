@@ -11,7 +11,6 @@ import xml.etree.ElementTree as ET
 # SET STATIC VARIABLES
 ###########################################################
 CONFIG_FILE = '/config/config.xml'
-RADARR_URL = 'http://127.0.0.1:7878'
 RADARR_DB = '/config/radarr.db'
 
 
@@ -70,11 +69,14 @@ def set_credential(database, username, password):
         db.execute(query, data)
         connexion.commit()
     except sqlite3.Error as er:
-        print('SQLite error: %s' % (' '.join(er.args)))
-        print("Exception class is: ", er.__class__)
-        print('SQLite traceback: ')
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        print(traceback.format_exception(exc_type, exc_value, exc_tb))
+        if er.args == "UNIQUE constraint failed: Users.Username":
+            print("*** warning *** User %s already exist" % username)
+        else:
+            print('SQLite error: %s' % (' '.join(er.args)))
+            print("Exception class is: ", er.__class__)
+            print('SQLite traceback: ')
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            print(traceback.format_exception(exc_type, exc_value, exc_tb))
 
     db.close()
 
@@ -277,6 +279,7 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
 ###########################################################
 
 print("[INIT] Get environment variable")
+RADARR_URL = os.environ.get('RADARR_URL')
 RADARR_USER = os.environ.get('RADARR_USER')
 RADARR_PASSWORD = os.environ.get('RADARR_PASSWORD')
 RADARR_ROOTPATH = os.environ.get('RADARR_ROOTPATH')
@@ -301,7 +304,7 @@ while check_health(RADARR_URL, RADARR_APIKEY) != 200:
 
 print("[INIT] Set Credential to application ...")
 set_credential(RADARR_DB, RADARR_USER, RADARR_PASSWORD)
-set_authenticationmethod(CONFIG_FILE, "forms")
+set_authenticationmethod(CONFIG_FILE, "Forms")
 
 print("[INIT] Configuring root path...")
 add_rootfolder(RADARR_URL, RADARR_APIKEY, RADARR_ROOTPATH)
