@@ -7,14 +7,12 @@ import sqlite3
 import traceback
 import xml.etree.ElementTree as ET
 
-
 ###########################################################
 # SET STATIC VARIABLES
 ###########################################################
 CONFIG_FILE = '/config/config.xml'
 RADARR_URL = 'http://127.0.0.1:7878'
 RADARR_DB = '/config/radarr.db'
-
 
 
 ###########################################################
@@ -31,6 +29,7 @@ def get_apikey(file):
 
     return apikey
 
+
 def set_authenticationmethod(file, method):
     if os.path.isfile(file) and os.path.exists(file):
         tree = ET.parse(file)
@@ -38,6 +37,7 @@ def set_authenticationmethod(file, method):
 
         root.find("AuthenticationMethod").text = method
         tree.write(file)
+
 
 def check_health(url, apikey):
     api_url = url + "/api/v3/health"
@@ -60,10 +60,10 @@ def check_health(url, apikey):
 
 
 def set_credential(database, username, password):
-    #Create user in database
+    # Create user in database
     data = ('652bf21b-fe69-47f7-8e52-80e0572a9025', username, password)
     query = "INSERT INTO Users (Identifier,Username,Password) VALUES(?, ?, ?)"
-    connexion = sqlite3(database)
+    connexion = sqlite3.connect(database)
     db = connexion.cursor()
 
     try:
@@ -77,7 +77,6 @@ def set_credential(database, username, password):
         print(traceback.format_exception(exc_type, exc_value, exc_tb))
 
     db.close()
-
 
 
 def add_rootfolder(url, apikey, folder):
@@ -273,7 +272,6 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
     return response.status_code
 
 
-
 ###########################################################
 # INIT CONFIG
 ###########################################################
@@ -295,8 +293,6 @@ DOWNLOAD_PORT = os.environ.get('DOWNLOAD_PORT')
 DOWNLOAD_USER = os.environ.get('DOWNLOAD_USER')
 DOWNLOAD_PASSWORD = os.environ.get('DOWNLOAD_PASSWORD')
 DOWNLOAD_FILMCATEGORY = os.environ.get('DOWNLOAD_FILMCATEGORY')
-
-
 
 print("[INIT] Waiting for application %s ..." % RADARR_URL)
 RADARR_APIKEY = get_apikey(CONFIG_FILE)
