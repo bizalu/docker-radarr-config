@@ -19,24 +19,25 @@ RADARR_DB = '/config/radarr.db'
 # DEFINE FUNCTION
 ###########################################################
 def get_apikey(file):
-    apikey = ""
+    while not os.path.exists(file):
+        time.sleep(1)
 
-    if os.path.isfile(file) and os.path.exists(file):
-        tree = ET.parse(file)
-        root = tree.getroot()
-
-        apikey = root.find("ApiKey").text
+    tree = ET.parse(file)
+    root = tree.getroot()
+    apikey = root.find("ApiKey").text
 
     return apikey
 
 
 def set_authenticationmethod(file, method):
-    if os.path.isfile(file) and os.path.exists(file):
-        tree = ET.parse(file)
-        root = tree.getroot()
+    while not os.path.exists(file):
+        time.sleep(1)
 
-        root.find("AuthenticationMethod").text = method
-        tree.write(file)
+    tree = ET.parse(file)
+    root = tree.getroot()
+
+    root.find("AuthenticationMethod").text = method
+    tree.write(file)
 
 
 def check_health(url, apikey):
