@@ -41,7 +41,7 @@ def set_authenticationmethod(file, method):
 
 
 def check_health(url, apikey):
-    api_url = url + "/api/v3/system/status"
+    api_url = url + "/api/v3/health"
     api_header = {'accept': 'application/json', 'X-Api-Key': apikey}
 
     try:
@@ -49,6 +49,7 @@ def check_health(url, apikey):
         response.raise_for_status()
     except requests.exceptions.HTTPError as errh:
         print(errh, file=sys.stderr)
+        sys.exit(response.status_code)
     except requests.exceptions.ConnectionError as errc:
         print(errc, file=sys.stderr)
     except requests.exceptions.Timeout as errt:
@@ -80,6 +81,7 @@ def set_credential(database, username, password):
             print(traceback.format_exception(exc_type, exc_value, exc_tb), file=sys.stderr)
 
     db.close()
+
 
 def add_rootfolder(url, apikey, folder):
     api_url = url + "/api/v3/rootfolder"
@@ -274,6 +276,25 @@ def add_downloader_remotepath(url, apikey, downloader_url, remote_path, local_pa
     return response.status_code
 
 
+def restart(url, apikey):
+    api_url = url + "/api/v3/system/restart"
+    api_header = {'accept': 'application/json', 'X-Api-Key': apikey}
+
+    try:
+        response = requests.post(api_url, headers=api_header)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as errh:
+        print(errh, file=sys.stderr)
+    except requests.exceptions.ConnectionError as errc:
+        print(errc, file=sys.stderr)
+    except requests.exceptions.Timeout as errt:
+        print(errt, file=sys.stderr)
+    except requests.exceptions.RequestException as err:
+        print(err, file=sys.stderr)
+
+    return response.status_code
+
+
 ###########################################################
 # INIT CONFIG
 ###########################################################
@@ -315,6 +336,9 @@ print("[INIT] Configuring Downloader Client...", file=sys.stdout)
 add_transmission_downloader(RADARR_URL, RADARR_APIKEY, DOWNLOAD_NAME, DOWNLOAD_URL, DOWNLOAD_PORT, DOWNLOAD_USER,
                             DOWNLOAD_PASSWORD, DOWNLOAD_FILMCATEGORY)
 add_downloader_remotepath(RADARR_URL, RADARR_APIKEY, DOWNLOAD_URL, RADARR_REMOTEPATH, RADARR_LOCALPATH)
+
+print("[INIT] Restart application...", file=sys.stdout)
+restart(RADARR_URL, RADARR_APIKEY)
 
 while True:
     time.sleep(1)
